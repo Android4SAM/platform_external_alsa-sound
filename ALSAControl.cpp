@@ -33,7 +33,7 @@
 
 #include "AudioHardwareALSA.h"
 
-namespace android
+namespace android_audio_legacy
 {
 
 ALSAControl::ALSAControl(const char *device)
@@ -214,4 +214,4 @@ status_t ALSAControl::set(const char *name, const char *value)
     return BAD_VALUE;
 }
 
-};        // namespace android
+};        // namespace android_audio_legacy

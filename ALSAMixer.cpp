@@ -42,7 +42,7 @@
     if (strlen(x) + strlen(y) < ALSA_NAME_MAX) \
         strcat(x, y);
 
-namespace android
+namespace android_audio_legacy
 {
 
 // ----------------------------------------------------------------------------
@@ -430,4 +430,4 @@ status_t ALSAMixer::getPlaybackMuteState(uint32_t device, bool *state)
     return BAD_VALUE;
 }
 
-};        // namespace android
+};        // namespace android_audio_legacy

@@ -3,7 +3,7 @@
 # Copyright 2008 Wind River Systems
 #
 
-ifeq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
+ifneq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
 
   LOCAL_PATH := $(call my-dir)
 
@@ -24,7 +24,11 @@ ifeq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
 
   LOCAL_MODULE := libaudio
 
-  LOCAL_STATIC_LIBRARIES += libaudiointerface
+  LOCAL_STATIC_LIBRARIES := \
+    libmedia_helper
+
+  LOCAL_WHOLE_STATIC_LIBRARIES := \
+    libaudiohw_legacy
 
   LOCAL_SHARED_LIBRARIES := \
     libasound \
@@ -37,6 +41,7 @@ ifeq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
 
 ifeq ($(BOARD_HAVE_BLUETOOTH),true)
   LOCAL_SHARED_LIBRARIES += liba2dp
+# LOCAL_SHARED_LIBRARIES += audio.a2dp.default
 endif
 
   include $(BUILD_SHARED_LIBRARY)
@@ -44,6 +49,8 @@ endif
 # This is the ALSA audio policy manager
 
   include $(CLEAR_VARS)
+
+  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
   LOCAL_CFLAGS := -D_POSIX_SOURCE
 
@@ -53,9 +60,15 @@ endif
 
   LOCAL_SRC_FILES := AudioPolicyManagerALSA.cpp
 
-  LOCAL_MODULE := libaudiopolicy
+# LOCAL_MODULE := libaudiopolicy
+  LOCAL_MODULE_TAGS := optional
+  LOCAL_MODULE := audio_policy.$(TARGET_PRODUCT)
 
-  LOCAL_WHOLE_STATIC_LIBRARIES += libaudiopolicybase
+  LOCAL_STATIC_LIBRARIES := \
+    libmedia_helper
+
+  LOCAL_WHOLE_STATIC_LIBRARIES := \
+    libaudiopolicy_legacy
 
   LOCAL_SHARED_LIBRARIES := \
     libcutils \
@@ -67,8 +80,6 @@ endif
 # This is the default ALSA module which behaves closely like the original
 
   include $(CLEAR_VARS)
-
-  LOCAL_PRELINK_MODULE := false
 
   LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
@@ -87,15 +98,13 @@ endif
   	liblog
 
   LOCAL_MODULE_TAGS := optional
-  LOCAL_MODULE:= alsa.default
+  LOCAL_MODULE := audio.primary.$(TARGET_PRODUCT)
 
   include $(BUILD_SHARED_LIBRARY)
 
 # This is the default Acoustics module which is essentially a stub
 
   include $(CLEAR_VARS)
-
-  LOCAL_PRELINK_MODULE := false
 
   LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 

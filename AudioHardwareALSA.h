@@ -19,14 +19,19 @@
 #define ANDROID_AUDIO_HARDWARE_ALSA_H
 
 #include <utils/List.h>
+#include <utils/threads.h>
 #include <hardware_legacy/AudioHardwareBase.h>
 
 #include <alsa/asoundlib.h>
 
 #include <hardware/hardware.h>
 
-namespace android
+namespace android_audio_legacy
 {
+
+using android::List;
+using android::Mutex;
+using android::AutoMutex;
 
 class AudioHardwareALSA;
 
@@ -261,6 +266,15 @@ public:
     // Unit: the number of input audio frames
     virtual unsigned int  getInputFramesLost() const;
 
+    virtual status_t    addAudioEffect(effect_handle_t effect)
+    {
+        return NO_ERROR;
+    }
+    virtual status_t    removeAudioEffect(effect_handle_t effect)
+    {
+        return NO_ERROR;
+    }
+
     status_t            setAcousticParams(void* params);
 
     status_t            open(int mode);
@@ -360,5 +374,5 @@ protected:
 
 // ----------------------------------------------------------------------------
 
-};        // namespace android
+};        // namespace android_audio_legacy
 #endif    // ANDROID_AUDIO_HARDWARE_ALSA_H

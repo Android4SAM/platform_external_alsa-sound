@@ -33,7 +33,7 @@
 #define ALSA_DEFAULT_SAMPLE_RATE 44100 // in Hz
 #endif
 
-namespace android
+namespace android_audio_legacy
 {
 
 static int s_device_open(const hw_module_t*, const char*, hw_device_t**);
@@ -51,7 +51,7 @@ extern "C" const hw_module_t HAL_MODULE_INFO_SYM = {
     tag             : HARDWARE_MODULE_TAG,
     version_major   : 1,
     version_minor   : 0,
-    id              : ALSA_HARDWARE_MODULE_ID,
+    id              : AUDIO_HARDWARE_MODULE_ID,
     name            : "ALSA module",
     author          : "Wind River",
     methods         : &s_module_methods,
@@ -119,7 +119,7 @@ static alsa_handle_t _defaultsIn = {
     handle      : 0,
     format      : SND_PCM_FORMAT_S16_LE, // AudioSystem::PCM_16_BIT
     channels    : 1,
-    sampleRate  : AudioRecord::DEFAULT_SAMPLE_RATE,
+    sampleRate  : android::AudioRecord::DEFAULT_SAMPLE_RATE,
     latency     : 250000, // Desired Delay in usec
     bufferSize  : 2048, // Desired Number of samples
     modPrivate  : 0,

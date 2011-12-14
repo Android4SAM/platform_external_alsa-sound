@@ -33,7 +33,7 @@
 
 #include "AudioHardwareALSA.h"
 
-namespace android
+namespace android_audio_legacy
 {
 
 AudioStreamInALSA::AudioStreamInALSA(AudioHardwareALSA *parent,
@@ -168,4 +168,4 @@ status_t AudioStreamInALSA::setAcousticParams(void *params)
     return aDev ? aDev->set_params(aDev, mAcoustics, params) : (status_t)NO_ERROR;
 }
 
-}       // namespace android
+}       // namespace android_audio_legacy

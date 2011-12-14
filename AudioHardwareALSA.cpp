@@ -33,18 +33,18 @@
 
 #include "AudioHardwareALSA.h"
 
+namespace android_audio_legacy
+{
+
 extern "C"
 {
     //
     // Function for dlsym() to look up for creating a new AudioHardwareInterface.
     //
-    android::AudioHardwareInterface *createAudioHardware(void) {
-        return android::AudioHardwareALSA::create();
+    AudioHardwareInterface *createAudioHardware(void) {
+        return AudioHardwareALSA::create();
     }
 }         // extern "C"
-
-namespace android
-{
 
 // ----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ AudioHardwareALSA::AudioHardwareALSA() :
     mMixer = new ALSAMixer;
 
     hw_module_t *module;
-    int err = hw_get_module(ALSA_HARDWARE_MODULE_ID,
+    int err = hw_get_module(AUDIO_HARDWARE_MODULE_ID,
             (hw_module_t const**)&module);
 
     if (err == 0) {
@@ -262,4 +262,4 @@ status_t AudioHardwareALSA::dump(int fd, const Vector<String16>& args)
     return NO_ERROR;
 }
 
-}       // namespace android
+}       // namespace android_audio_legacy

@@ -20,7 +20,7 @@
 #include "AudioPolicyManagerALSA.h"
 #include <media/mediarecorder.h>
 
-namespace android {
+namespace android_audio_legacy {
 
 // ----------------------------------------------------------------------------
 // AudioPolicyManagerALSA
@@ -49,4 +49,4 @@ AudioPolicyManagerALSA::~AudioPolicyManagerALSA()
 {
 }
 
-}; // namespace android
+}; // namespace android_audio_legacy
