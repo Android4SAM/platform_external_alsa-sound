@@ -22,17 +22,16 @@
 #include <utils/threads.h>
 #include <hardware_legacy/AudioHardwareBase.h>
 
-#include <alsa/asoundlib.h>
+#include "alsa/asoundlib.h"
 
 #include <hardware/hardware.h>
 
 namespace android_audio_legacy
 {
+    using android::Mutex;
+    using android::AutoMutex;
 
-using android::List;
-using android::Mutex;
-using android::AutoMutex;
-
+// ----------------------------------------------------------------------------
 class AudioHardwareALSA;
 
 /**
@@ -57,7 +56,7 @@ struct alsa_handle_t {
     void *              modPrivate;
 };
 
-typedef List<alsa_handle_t> ALSAHandleList;
+typedef android::List<alsa_handle_t> ALSAHandleList;
 
 struct alsa_device_t {
     hw_device_t common;
@@ -266,19 +265,12 @@ public:
     // Unit: the number of input audio frames
     virtual unsigned int  getInputFramesLost() const;
 
-    virtual status_t    addAudioEffect(effect_handle_t effect)
-    {
-        return NO_ERROR;
-    }
-    virtual status_t    removeAudioEffect(effect_handle_t effect)
-    {
-        return NO_ERROR;
-    }
-
     status_t            setAcousticParams(void* params);
 
     status_t            open(int mode);
     status_t            close();
+    virtual status_t    addAudioEffect(effect_handle_t effect) { return NO_ERROR; }
+    virtual status_t    removeAudioEffect(effect_handle_t effect) { return NO_ERROR; }
 
 private:
     void                resetFramesLost();
@@ -319,6 +311,10 @@ public:
     // mic mute
     virtual status_t    setMicMute(bool state);
     virtual status_t    getMicMute(bool* state);
+    virtual size_t       getInputBufferSize(uint32_t sampleRate,
+                                                       int format,
+                                                       int channelCount);	
+    static uint32_t      bufferRatio(uint32_t samplingRate);
 
     // set/get global audio parameters
     //virtual status_t    setParameters(const String8& keyValuePairs);

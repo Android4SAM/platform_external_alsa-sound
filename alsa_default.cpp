@@ -51,7 +51,7 @@ extern "C" const hw_module_t HAL_MODULE_INFO_SYM = {
     tag             : HARDWARE_MODULE_TAG,
     version_major   : 1,
     version_minor   : 0,
-    id              : AUDIO_HARDWARE_MODULE_ID,
+    id              : ALSA_HARDWARE_MODULE_ID,
     name            : "ALSA module",
     author          : "Wind River",
     methods         : &s_module_methods,
@@ -107,7 +107,9 @@ static alsa_handle_t _defaultsOut = {
     channels    : 2,
     sampleRate  : DEFAULT_SAMPLE_RATE,
     latency     : 200000, // Desired Delay in usec
-    bufferSize  : DEFAULT_SAMPLE_RATE / 5, // Desired Number of samples
+    // Change by embest, For video A/V sync, one audio frame size is 4096
+    // the buffers numbers set by android is 4, so change it to 1024 = 4096 / 4
+    bufferSize  : 1024, // Desired Number of samples
     modPrivate  : 0,
 };
 
@@ -118,8 +120,8 @@ static alsa_handle_t _defaultsIn = {
     curMode     : 0,
     handle      : 0,
     format      : SND_PCM_FORMAT_S16_LE, // AudioSystem::PCM_16_BIT
-    channels    : 1,
-    sampleRate  : android::AudioRecord::DEFAULT_SAMPLE_RATE,
+    channels    : 2,
+    sampleRate  : DEFAULT_SAMPLE_RATE,
     latency     : 250000, // Desired Delay in usec
     bufferSize  : 2048, // Desired Number of samples
     modPrivate  : 0,

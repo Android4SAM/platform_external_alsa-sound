@@ -3,7 +3,7 @@
 # Copyright 2008 Wind River Systems
 #
 
-ifneq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
+ifeq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
 
   LOCAL_PATH := $(call my-dir)
 
@@ -12,7 +12,7 @@ ifneq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
   LOCAL_ARM_MODE := arm
   LOCAL_CFLAGS := -D_POSIX_SOURCE
 
-  LOCAL_C_INCLUDES += external/alsa-lib/include
+  LOCAL_C_INCLUDES += $(TOPDIR)external/alsa-lib/include
 
   LOCAL_SRC_FILES := \
 	AudioHardwareALSA.cpp \
@@ -22,13 +22,12 @@ ifneq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
 	ALSAMixer.cpp \
 	ALSAControl.cpp
 
-  LOCAL_MODULE := libaudio
+#  LOCAL_MODULE := libaudio
+   LOCAL_MODULE := audio.primary.$(TARGET_BOOTLOADER_BOARD_NAME)
 
-  LOCAL_STATIC_LIBRARIES := \
-    libmedia_helper
-
-  LOCAL_WHOLE_STATIC_LIBRARIES := \
-    libaudiohw_legacy
+   LOCAL_MODULE_TAGS := optional
+   
+  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
   LOCAL_SHARED_LIBRARIES := \
     libasound \
@@ -37,20 +36,24 @@ ifneq ($(strip $(BOARD_USES_ALSA_AUDIO)),true)
     libmedia \
     libhardware \
     libhardware_legacy \
-    libc
+    libc \
+	libaudioflinger
 
-ifeq ($(BOARD_HAVE_BLUETOOTH),true)
-  LOCAL_SHARED_LIBRARIES += liba2dp
-# LOCAL_SHARED_LIBRARIES += audio.a2dp.default
-endif
+#ifeq ($(BOARD_HAVE_BLUETOOTH),true)
+ # LOCAL_SHARED_LIBRARIES += liba2dp
+#endif
 
+LOCAL_STATIC_LIBRARIES := \
+    libmedia_helper
+
+LOCAL_WHOLE_STATIC_LIBRARIES := \
+    libaudiohw_legacy
+	
   include $(BUILD_SHARED_LIBRARY)
 
 # This is the ALSA audio policy manager
 
   include $(CLEAR_VARS)
-
-  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
   LOCAL_CFLAGS := -D_POSIX_SOURCE
 
@@ -60,26 +63,25 @@ endif
 
   LOCAL_SRC_FILES := AudioPolicyManagerALSA.cpp
 
-# LOCAL_MODULE := libaudiopolicy
-  LOCAL_MODULE_TAGS := optional
-  LOCAL_MODULE := audio_policy.$(TARGET_PRODUCT)
+  LOCAL_MODULE := libaudiopolicy
 
-  LOCAL_STATIC_LIBRARIES := \
-    libmedia_helper
-
-  LOCAL_WHOLE_STATIC_LIBRARIES := \
-    libaudiopolicy_legacy
+  LOCAL_WHOLE_STATIC_LIBRARIES += libaudiopolicy_legacy
 
   LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libutils \
     libmedia
 
+LOCAL_STATIC_LIBRARIES := \
+    libmedia_helper
+	
   include $(BUILD_SHARED_LIBRARY)
 
 # This is the default ALSA module which behaves closely like the original
 
   include $(CLEAR_VARS)
+
+  LOCAL_PRELINK_MODULE := false
 
   LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
@@ -89,7 +91,7 @@ ifneq ($(ALSA_DEFAULT_SAMPLE_RATE),)
     LOCAL_CFLAGS += -DALSA_DEFAULT_SAMPLE_RATE=$(ALSA_DEFAULT_SAMPLE_RATE)
 endif
 
-  LOCAL_C_INCLUDES += external/alsa-lib/include
+  LOCAL_C_INCLUDES += $(TOPDIR)external/alsa-lib/include
 
   LOCAL_SRC_FILES:= alsa_default.cpp
 
@@ -97,8 +99,9 @@ endif
   	libasound \
   	liblog
 
+  LOCAL_MODULE:= alsa.default
+
   LOCAL_MODULE_TAGS := optional
-  LOCAL_MODULE := audio.primary.$(TARGET_PRODUCT)
 
   include $(BUILD_SHARED_LIBRARY)
 
@@ -106,18 +109,21 @@ endif
 
   include $(CLEAR_VARS)
 
+  LOCAL_PRELINK_MODULE := false
+
   LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
   LOCAL_CFLAGS := -D_POSIX_SOURCE -Wno-multichar
 
-  LOCAL_C_INCLUDES += external/alsa-lib/include
+  LOCAL_C_INCLUDES += $(TOPDIR)external/alsa-lib/include
 
   LOCAL_SRC_FILES:= acoustics_default.cpp
 
   LOCAL_SHARED_LIBRARIES := liblog
 
-  LOCAL_MODULE_TAGS := optional
   LOCAL_MODULE:= acoustics.default
+
+  LOCAL_MODULE_TAGS := optional
 
   include $(BUILD_SHARED_LIBRARY)
 

@@ -45,7 +45,6 @@ extern "C"
         return AudioHardwareALSA::create();
     }
 }         // extern "C"
-
 // ----------------------------------------------------------------------------
 
 static void ALSAErrorHandler(const char *file,
@@ -63,7 +62,7 @@ static void ALSAErrorHandler(const char *file,
     l = snprintf(buf, BUFSIZ, "%s:%i:(%s) ", file, line, function);
     vsnprintf(buf + l, BUFSIZ - l, fmt, arg);
     buf[BUFSIZ-1] = '\0';
-    LOG(LOG_ERROR, "ALSALib", "%s", buf);
+    LOGE("ALSALib %s", buf);
     va_end(arg);
 }
 
@@ -79,7 +78,7 @@ AudioHardwareALSA::AudioHardwareALSA() :
     mMixer = new ALSAMixer;
 
     hw_module_t *module;
-    int err = hw_get_module(AUDIO_HARDWARE_MODULE_ID,
+    int err = hw_get_module(ALSA_HARDWARE_MODULE_ID,
             (hw_module_t const**)&module);
 
     if (err == 0) {
@@ -256,6 +255,44 @@ status_t AudioHardwareALSA::getMicMute(bool *state)
 
     return NO_ERROR;
 }
+
+uint32_t AudioHardwareALSA::bufferRatio(uint32_t samplingRate) {
+    switch (samplingRate) {
+    case 8000:
+    case 11025:
+        return 4;
+    case 16000:
+    case 22050:
+        return 2;
+    case 44100:
+    default:
+        break;
+    }
+    return 1;
+}
+
+size_t AudioHardwareALSA::getInputBufferSize(uint32_t sampleRate, int format, int channelCount)
+{
+    if (sampleRate != 8000 && sampleRate != 11025 && sampleRate != 16000 &&
+            sampleRate != 22050 && sampleRate != 44100 && sampleRate != 48000) {
+        LOGW("getInputBufferSize bad sampling rate: %d", sampleRate);
+        return 0;
+    }
+    if (format != AudioSystem::PCM_16_BIT) {
+        LOGW("getInputBufferSize bad format: %d", format);
+        return 0;
+    }
+    if (channelCount != 1 && channelCount != 2) {
+        LOGW("getInputBufferSize bad channel count: %d", channelCount);
+        return 0;
+    }
+
+    size_t size = ((512 * 2) / bufferRatio(sampleRate)) * sizeof(int16_t);
+    LOGV("getInputBufferSize() rate %d, ratio %d", sampleRate, size);
+    return size;
+
+}
+
 
 status_t AudioHardwareALSA::dump(int fd, const Vector<String16>& args)
 {
